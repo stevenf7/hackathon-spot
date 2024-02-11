@@ -81,7 +81,7 @@ class RobotInterface:
                         "content": [
                             {
                                 "type": "text",
-                                "text": "What’s in this image? describe in a mean, sarcastic and concise way."
+                                "text": "What’s in this image in 50 words or less"
                             },
                             {
                                 "type": "image_url",
@@ -100,6 +100,9 @@ class RobotInterface:
             content = response.json()['choices'][0]['message']['content']
 
             print(response.json()['choices'][0]['message']['content'])
+
+
+
 
             audio = generate(
                     text=f"{content}",
