@@ -112,5 +112,3 @@ class RobotInterface:
             play(audio)
         else:
                 print("Error: Could not capture an image.")
-
-
