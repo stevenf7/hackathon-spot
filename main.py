@@ -1,6 +1,7 @@
 import os
 import time
-from spot_controller import SpotController
+# from spot_controller import SpotController
+from robot_interface import RobotInterface
 
 ROBOT_IP = "192.168.50.3"#os.environ['ROBOT_IP']
 SPOT_USERNAME = "admin"#os.environ['SPOT_USERNAME']
@@ -24,26 +25,23 @@ def main():
     print(f"Image Dimensions: {image.shape}")
     camera_capture.release()
 
-    # Use wrapper in context manager to lease control, turn on E-Stop, power on the robot and stand up at start
-    # and to return lease + sit down at the end
-    with SpotController(username=SPOT_USERNAME, password=SPOT_PASSWORD, robot_ip=ROBOT_IP) as spot:
+    controller = RobotInterface()
 
-        time.sleep(2)
+    controller.dance()
 
-        # Move head to specified positions with intermediate time.sleep
-        spot.move_head_in_points(yaws=[0.2, 0],
-                                 pitches=[0.3, 0],
-                                 rolls=[0.4, 0],
-                                 sleep_after_point_reached=1)
-        time.sleep(3)
+    controller.sit()
 
-        # Make Spot to move by goal_x meters forward and goal_y meters left
-        spot.move_to_goal(goal_x=0.5, goal_y=0)
-        time.sleep(3)
+    controller.stand()
 
-        # Control Spot by velocity in m/s (or in rad/s for rotation)
-        spot.move_by_velocity_control(v_x=-0.3, v_y=0, v_rot=0, cmd_duration=2)
-        time.sleep(3)
+    controller.move_forward()
+
+    controller.move_backward()
+
+    controller.move_left()
+
+    controller.move_right
+
+    
 
 
 if __name__ == '__main__':
