@@ -1,5 +1,4 @@
 import cv2
-import imutils
 import os
 from queue import Queue
 import threading
@@ -15,35 +14,58 @@ SPOT_PASSWORD = "2zqa8dgw7lor"#os.environ['SPOT_PASSWORD']
 
 queue = Queue(10)
 
-cam = cv2.VideoCapture(0)
 
 def listen():
-    for i in range(5):
+    cam = cv2.VideoCapture(0)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+    aruco_params = cv2.aruco.DetectorParameters()
+    detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
+
+    for i in range(100):
         ret, frame = cam.read()
-        cv2.imshow("test", frame)
-        time.sleep(3)
-        # arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
-        # arucoParams = cv2.aruco.DetectorParameters_create()
-        # (corners, ids, rejected) = cv2.aruco.detectMarkers(image, arucoDict, parameters=arucoParams)
+        if ret: 
+            corners, ids, rejected = detector.detectMarkers(frame)
 
-        # if len(ids) == 0:
-        #     time.sleep(0.2)
-        #     continue
+            if not corners:
+                pass
+            else:
+                print("Start recording audio")
+                sample_name = f"{i}.wav"
+                cmd = f'arecord -vv --format=cd --device={os.environ["AUDIO_INPUT_DEVICE"]} -r 48000 --duration=10 -c 1 {sample_name}'
+                print(cmd)
+                os.system(cmd)
 
-        # listen for voice command
-        # convert to text
-        # upload to openai
-        # get command
-        # push command on queue
+                queue.put("hello")
+
+            # listen for voice command
+            # convert to text
+            # upload to openai
+            # get command
+            # push command on queue
+        else:
+            print("failed to capture image")
+        time.sleep(0.5)
+
+    queue.put("<STOP>")
+    cam.release()
+    cv2.destroyAllWindows()
 
 def action():
-    while True:
+    for _ in range(100):
         cmd = queue.get()
-        
+        match cmd:
+            case "<STOP>":
+                break
+            case other:
+                print(cmd)
+
 
 def main():
-    listen_thread = threading.Thread(target=listen)
-    listen_thread.start()
+    action_thread = threading.Thread(target=action)
+    action_thread.start()
+    # listen_thread = threading.Thread(target=listen)
+    # listen_thread.start()
+    listen()
 
 
 def main2():
