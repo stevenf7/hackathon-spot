@@ -8,8 +8,8 @@ SPOT_PASSWORD = "2zqa8dgw7lor"#os.environ['SPOT_PASSWORD']
 
 
 class RobotInterface:
-    def __init__(self):
-        self.spot = SpotController(SPOT_USERNAME, SPOT_PASSWORD, ROBOT_IP)
+    def __init__(self, spot):
+        self.spot = spot
 
     def dance(self):
         for i in range(3):
