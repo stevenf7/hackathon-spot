@@ -12,10 +12,9 @@ SPOT_PASSWORD = "2zqa8dgw7lor" # os.environ['SPOT_PASSWORD']
 
 
 queue = Queue(10)
-
+cam = cv2.VideoCapture(0)
 
 def listen():
-    cam = cv2.VideoCapture(0)
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
     aruco_params = cv2.aruco.DetectorParameters()
     detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
@@ -49,10 +48,8 @@ def listen():
         else:
             print("failed to capture image")
         time.sleep(1)
-
     queue.put("<STOP>")
-    cam.release()
-    cv2.destroyAllWindows()
+
 
 def action():
     # for _ in range(100):
@@ -63,7 +60,7 @@ def action():
         for _ in range(100):
             cmd = queue.get()
             if cmd == "<describe>":
-                robot.describe_env()
+                robot.describe_env(cam)
             elif cmd == "<dance>":
                 robot.dance()
             elif cmd == "<sit>":
