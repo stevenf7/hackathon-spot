@@ -81,7 +81,7 @@ class RobotInterface:
                         "content": [
                             {
                                 "type": "text",
-                                "text": "What’s in this image in 50 words or less"
+                                "text": "What’s in this image in 15 words or less?"
                             },
                             {
                                 "type": "image_url",
