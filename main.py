@@ -24,27 +24,31 @@ def main():
     camera_capture = cv2.VideoCapture(0)
     rv, image = camera_capture.read()
     print(f"Image Dimensions: {image.shape}")
-    camera_capture.release()
+   
     with SpotController(username=SPOT_USERNAME, password=SPOT_PASSWORD, robot_ip=ROBOT_IP) as spot:
 
         controller = RobotInterface(spot)
 
+        controller.describe_env(camera_capture)
+        
         controller.dance()
 
-        controller.sit()
+        # controller.sit()
 
-        controller.stand()
+        # controller.stand()
 
-        controller.move_forward()
+        # controller.move_forward()
 
-        controller.move_backward()
+        # controller.move_backward()
 
-        controller.move_left()
+        # controller.move_left()
 
-        controller.move_right()
+        # controller.move_right()
 
     
+    camera_capture.release()
 
+    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main()

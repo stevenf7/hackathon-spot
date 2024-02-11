@@ -1,6 +1,12 @@
 import os
 import time
 from spot_controller import SpotController
+import cv2
+import requests
+import openai
+import base64
+from io import BytesIO
+from elevenlabs import generate, play, set_api_key
 
 ROBOT_IP = "192.168.50.3"#os.environ['ROBOT_IP']
 SPOT_USERNAME = "admin"#os.environ['SPOT_USERNAME']
@@ -14,14 +20,16 @@ class RobotInterface:
     def dance(self):
         for i in range(3):
             self.spot.bow(-1)
-            time.sleep(1)
-            self.spot.bow(1)
-            time.sleep(1)
 
         # Move head to specified positions with intermediate time.sleep
         self.spot.move_head_in_points(yaws=[0.2, 0],
                                  pitches=[0.3, 0],
                                  rolls=[0.4, 0],
+                                 sleep_after_point_reached=1)
+
+        self.spot.move_head_in_points(yaws=[-0.2, 0],
+                                 pitches=[-0.3, 0],
+                                 rolls=[-0.4, 0],
                                  sleep_after_point_reached=1)
         time.sleep(1)
 
@@ -43,34 +51,63 @@ class RobotInterface:
         time.sleep(1)
 
     def move_left(self):
-        self.spot.move_to_goal(goal_x=0, goal_y=-0.5)
-        time.sleep(1)
-
-    def move_right(self):
         self.spot.move_to_goal(goal_x=0, goal_y=0.5)
         time.sleep(1)
 
-    def describe_env(self):
-        raise NotImplementedError()
+    def move_right(self):
+        self.spot.move_to_goal(goal_x=0, goal_y=-0.5)
+        time.sleep(1)
+
+    def describe_env(self, cap):
+        ret, frame = cap.read()
+
+        # Check if the frame was captured successfully
+        if ret:
+            # Convert the image to PNG format (OpenAI API might require specific formats)
+            _, buffer = cv2.imencode('.png', frame)
+            img_str = base64.b64encode(buffer).decode('utf-8')
 
 
-class MockRobot(RobotInterface):
-    def sit(self):
-        print("sit")
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {os.environ['openai']}"
+            }
 
-    def move(self):
-        print("move")
+            payload = {
+                "model": "gpt-4-vision-preview",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "What’s in this image? describe in a mean, sarcastic and concise way."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{img_str}"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "max_tokens": 300
+            }
 
-    def describe_env(self):
-        print("describe_env")
+            response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+            content = response.json()['choices'][0]['message']['content']
+
+            print(response.json()['choices'][0]['message']['content'])
+
+            audio = generate(
+                    text=f"{content}",
+                    voice="Gigi",
+                    model="eleven_multilingual_v1"
+            )
+            play(audio)
+        else:
+                print("Error: Could not capture an image.")
 
 
-class SpotRobot(RobotInterface):
-    def sit(self):
-        print("sit")
-
-    def move(self):
-        print("move")
-
-    def describe_env(self):
-        print("describe_env")
