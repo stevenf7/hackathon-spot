@@ -3,9 +3,8 @@ import os
 from queue import Queue
 import threading
 import time
-# from spot_controller import SpotController
-from robot_interface import RobotInterface
 from spot_controller import SpotController
+from robot_interface import RobotInterface
 
 ROBOT_IP = "192.168.50.3" # os.environ['ROBOT_IP']
 SPOT_USERNAME = "admin" # os.environ['SPOT_USERNAME']
@@ -29,25 +28,24 @@ def listen():
             if not corners:
                 pass
             else:
-                match ids[0]:
-                    case 0:
-                        queue.put("<stop>")
-                    case 1:
-                        queue.put("<describe>")
-                    case 2:
-                        queue.put("<dance>")
-                    case 3:
-                        queue.put("<sit>") 
-                    case 4:
-                        queue.put("<stand>")
-                    case 5:
-                        queue.put("<forward>")
-                    case 6:
-                        queue.put("<back>")
-                    case 7:
-                        queue.put("<left>")
-                    case 8:
-                        queue.put("<right>")
+                if ids[0] == 0:
+                    queue.put("<stop>")
+                elif ids[0] == 1:
+                    queue.put("<describe>")
+                elif ids[0] == 2:
+                    queue.put("<dance>")
+                elif ids[0] == 3:
+                    queue.put("<sit>")
+                elif ids[0] == 4:
+                    queue.put("<stand>")
+                elif ids[0] == 5:
+                    queue.put("<forward>")
+                elif ids[0] == 6:
+                    queue.put("<back>")
+                elif ids[0] == 7:
+                    queue.put("<left>")
+                elif ids[0] == 8:
+                    queue.put("<right>")
         else:
             print("failed to capture image")
         time.sleep(1)
@@ -57,29 +55,31 @@ def listen():
     cv2.destroyAllWindows()
 
 def action():
+    # for _ in range(100):
+    #     cmd = queue.get()
+    #     print(cmd)
     with SpotController(username=SPOT_USERNAME, password=SPOT_PASSWORD, robot_ip=ROBOT_IP) as spot:
         robot = RobotInterface(spot)
         for _ in range(100):
             cmd = queue.get()
-            match cmd:
-                case "<describe>":
-                    robot.describe_env()
-                case "<dance>":
-                    robot.dance()
-                case "<sit>":
-                    robot.sit()
-                case "<stand>":
-                    robot.stand()
-                case "<forward>":
-                    robot.move_forward()
-                case "<backward>":
-                    robot.move_backward()
-                case "<left>":
-                    robot.move_left()
-                case "<right>":
-                    robot.move_right()
-                case other:
-                    break
+            if cmd == "<describe>":
+                robot.describe_env()
+            elif cmd == "<dance>":
+                robot.dance()
+            elif cmd == "<sit>":
+                robot.sit()
+            elif cmd == "<stand>":
+                robot.stand()
+            elif cmd == "<forward>":
+                robot.move_forward()
+            elif cmd == "<backward>":
+                 robot.move_backward()
+            elif cmd == "<left>":
+                robot.move_left()
+            elif cmd == "<right>":
+                robot.move_right()
+            else:
+                break
 
 
 def main():
