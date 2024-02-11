@@ -1,4 +1,8 @@
+import cv2
+import imutils
 import os
+from queue import Queue
+import threading
 import time
 # from spot_controller import SpotController
 from robot_interface import RobotInterface
@@ -9,7 +13,40 @@ SPOT_USERNAME = "admin"#os.environ['SPOT_USERNAME']
 SPOT_PASSWORD = "2zqa8dgw7lor"#os.environ['SPOT_PASSWORD']
 
 
+queue = Queue(10)
+
+cam = cv2.VideoCapture(0)
+
+def listen():
+    for i in range(5):
+        ret, frame = cam.read()
+        cv2.imshow("test", frame)
+        time.sleep(3)
+        # arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
+        # arucoParams = cv2.aruco.DetectorParameters_create()
+        # (corners, ids, rejected) = cv2.aruco.detectMarkers(image, arucoDict, parameters=arucoParams)
+
+        # if len(ids) == 0:
+        #     time.sleep(0.2)
+        #     continue
+
+        # listen for voice command
+        # convert to text
+        # upload to openai
+        # get command
+        # push command on queue
+
+def action():
+    while True:
+        cmd = queue.get()
+        
+
 def main():
+    listen_thread = threading.Thread(target=listen)
+    listen_thread.start()
+
+
+def main2():
     #example of using micro and speakers
     print("Start recording audio")
     sample_name = "aaaa.wav"
@@ -20,7 +57,6 @@ def main():
     os.system(f"ffplay -nodisp -autoexit -loglevel quiet {sample_name}")
     
     # Capture image
-    import cv2
     camera_capture = cv2.VideoCapture(0)
     rv, image = camera_capture.read()
     print(f"Image Dimensions: {image.shape}")
