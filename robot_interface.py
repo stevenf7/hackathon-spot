@@ -19,7 +19,7 @@ class RobotInterface:
 
     def dance(self):
         for i in range(3):
-            self.spot.bow(-1)
+            self.spot.bow(1)
 
         # Move head to specified positions with intermediate time.sleep
         self.spot.move_head_in_points(yaws=[0.2, 0],
