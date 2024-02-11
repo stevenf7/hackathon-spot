@@ -50,7 +50,7 @@ def listen():
                         queue.put("<right>")
         else:
             print("failed to capture image")
-        time.sleep(0.5)
+        time.sleep(1)
 
     queue.put("<STOP>")
     cam.release()
@@ -104,28 +104,16 @@ def main():
 #     print(f"Image Dimensions: {image.shape}")
    
 #     with SpotController(username=SPOT_USERNAME, password=SPOT_PASSWORD, robot_ip=ROBOT_IP) as spot:
-
 #         controller = RobotInterface(spot)
-
 #         controller.describe_env(camera_capture)
-        
 #         controller.dance()
-
 #         # controller.sit()
-
 #         # controller.stand()
-
 #         # controller.move_forward()
-
 #         # controller.move_backward()
-
 #         # controller.move_left()
-
 #         # controller.move_right()
-
-    
 #     camera_capture.release()
-
 #     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
